@@ -30,3 +30,4 @@ C:\Users\josip\Documents\Faks\Mono praksa\Backend\Introduction\IntroductionWebAP
 C:\Users\josip\Documents\Faks\Mono praksa\Backend\Introduction\IntroductionWebAPI\obj\Debug\net8.0\IntroductionWebAPI.pdb
 C:\Users\josip\Documents\Faks\Mono praksa\Backend\Introduction\IntroductionWebAPI\obj\Debug\net8.0\IntroductionWebAPI.genruntimeconfig.cache
 C:\Users\josip\Documents\Faks\Mono praksa\Backend\Introduction\IntroductionWebAPI\obj\Debug\net8.0\ref\IntroductionWebAPI.dll
+C:\Users\josip\Documents\Faks\Mono praksa\Backend\Introduction\IntroductionWebAPI\bin\Debug\net8.0\Npgsql.dll

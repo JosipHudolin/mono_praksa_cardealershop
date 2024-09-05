@@ -9,7 +9,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.Int32",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -35,7 +35,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.Int32",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -43,43 +43,12 @@
   },
   {
     "ContainingType": "IntroductionWebAPI.Controllers.CarController",
-    "Method": "GetCars",
+    "Method": "GetAllCars",
     "RelativePath": "Car/getCars",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [
-      {
-        "Name": "make",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "model",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "year",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "mileage",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "inputDate",
-        "Type": "System.Nullable\u00601[[System.DateOnly, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
-      },
-      {
-        "Name": "beforeAfter",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -101,11 +70,37 @@
   {
     "ContainingType": "IntroductionWebAPI.Controllers.CarController",
     "Method": "UpdateCarDescription",
-    "RelativePath": "Car/updateCarDescription",
+    "RelativePath": "Car/updateCarDescription/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
+      {
+        "Name": "car",
+        "Type": "IntroductionWebAPI.Car",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IntroductionWebAPI.Controllers.CarController",
+    "Method": "UpdateCarMileage",
+    "RelativePath": "Car/updateCarMileage/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
       {
         "Name": "car",
         "Type": "IntroductionWebAPI.Car",
@@ -115,16 +110,79 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "IntroductionWebAPI.Controllers.CarController",
-    "Method": "UpdateCarMileage",
-    "RelativePath": "Car/updateCarMileage",
+    "ContainingType": "IntroductionWebAPI.Controllers.CarTypeController",
+    "Method": "Delete",
+    "RelativePath": "CarType/deleteCarType/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IntroductionWebAPI.Controllers.CarTypeController",
+    "Method": "Get",
+    "RelativePath": "CarType/getCarTypeName",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IntroductionWebAPI.Controllers.CarTypeController",
+    "Method": "GetById",
+    "RelativePath": "CarType/GetCarTypeName/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IntroductionWebAPI.Controllers.CarTypeController",
+    "Method": "InputCarType",
+    "RelativePath": "CarType/insertCarType",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "carType",
+        "Type": "IntroductionWebAPI.CarType",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "IntroductionWebAPI.Controllers.CarTypeController",
+    "Method": "UpdateNameById",
+    "RelativePath": "CarType/updateCarTypeName/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "car",
-        "Type": "IntroductionWebAPI.Car",
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "name",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],
