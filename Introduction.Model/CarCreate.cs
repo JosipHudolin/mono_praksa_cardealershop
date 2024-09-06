@@ -1,4 +1,4 @@
-﻿using IntroductionWebAPI.Models;
+﻿using Introduction.Model;
 
 namespace IntroductionWebAPI.Models
 {

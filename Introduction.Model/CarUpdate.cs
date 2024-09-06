@@ -1,4 +1,4 @@
-﻿namespace IntroductionWebAPI.Models
+﻿namespace Introduction.Model
 {
     public class CarUpdate
     {

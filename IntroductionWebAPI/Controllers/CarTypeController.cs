@@ -1,4 +1,5 @@
-﻿using IntroductionWebAPI.Models;
+﻿using Introduction.Model;
+using Introduction.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
@@ -9,171 +10,64 @@ namespace IntroductionWebAPI.Controllers
     [ApiController]
     public class CarTypeController : ControllerBase
     {
-        private const string CONNECTION_STRING = "Host=localhost:5432;Username=postgres;Password=postgres;Database=car-dealershop";
-
         [HttpGet]
         [Route("getCarTypeName")]
         public IActionResult Get()
         {
-            try
+            var service = new CarTypeService();
+            if (service.Get() != null)
             {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-                connection.Open();
-
-                string commandText = $"SELECT \"Id\", \"Name\" FROM \"CarType\"";
-
-                using var command = new NpgsqlCommand(commandText, connection);
-                using var reader = command.ExecuteReader();
-
-                var carTypes = new List<CarType>();
-
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        var carType = new CarType();
-                        carType.Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString());
-                        carType.Name = reader.IsDBNull(1) ? null : reader[1].ToString();
-
-                        carTypes.Add(carType);
-                    }
-
-                }
-                connection.Close();
-                return Ok(carTypes);
+                return Ok(service.Get());
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error: {ex.Message}");
-            }
+            return BadRequest();
         }
 
         [HttpGet]
         [Route("GetCarTypeName/{id}")]
         public IActionResult GetById(Guid id)
         {
-            try
+            var service = new CarTypeService();
+            if (service.GetById(id) != null)
             {
-                var carType = new CarType();
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-                string commandText = $"SELECT \"Id\", \"Name\" FROM \"CarType\" WHERE \"Id\" = @id";
-                using var command = new NpgsqlCommand(commandText, connection);
-
-                command.Parameters.AddWithValue("@id", id);
-                connection.Open();
-                using NpgsqlDataReader reader = command.ExecuteReader();
-
-                if (reader.HasRows)
-                {
-                    reader.Read();
-
-                    carType.Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString());
-                    carType.Name = reader.IsDBNull(1) ? null : reader[1].ToString();
-                }
-                if (carType == null)
-                {
-                    return NotFound();
-                }
-                connection.Close();
-                return Ok(carType);
+                return Ok(service.GetById(id));
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return BadRequest();
         }
 
         [HttpPost]
         [Route("insertCarType")]
         public IActionResult InputCarType([FromBody] CarType carType)
         {
-            try
+            var service = new CarTypeService();
+            if (service.InputCarType(carType))
             {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-
-                string commandText = "INSERT INTO \"CarType\" (\"Id\", \"Name\") VALUES (@id, @name)";
-
-                connection.Open();
-
-                using var command = new NpgsqlCommand(commandText, connection);
-
-                command.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, Guid.NewGuid());
-                command.Parameters.AddWithValue("@name", carType.Name);
-
-                int numberOfCommits = command.ExecuteNonQuery();
-
-                if (numberOfCommits == 0)
-                {
-                    return BadRequest();
-                }
-
-                connection.Close();
                 return Ok();
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return BadRequest();
         }
 
         [HttpPut]
         [Route("updateCarTypeName/{id}")]
         public IActionResult UpdateNameById(Guid id, [FromBody] string name)
         {
-            try
+            var service = new CarTypeService();
+            if (service.UpdateNameById(id, name))
             {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-                connection.Open();
-
-                string commandText = $"UPDATE \"CarType\" SET \"Name\" = @name WHERE \"Id\" = @id";
-
-                using var command = new NpgsqlCommand(commandText, connection);
-                command.Parameters.AddWithValue("@id", id);
-                command.Parameters.AddWithValue("@name", name);
-
-                int numberOfCommits = command.ExecuteNonQuery();
-
-                if (numberOfCommits == 0)
-                {
-                    return NotFound("CarType not found");
-                }
-                connection.Close();
-                return NoContent();
+                return Ok();
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error: {ex.Message}");
-            }
+            return BadRequest("Car type not found!");
         }
 
         [HttpDelete]
         [Route("deleteCarType/{id}")]
         public IActionResult Delete(Guid id)
         {
-            try
+            var service = new CarTypeService();
+            if (service.Delete(id))
             {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-                connection.Open();
-
-                string commandText = $"DELETE FROM \"CarType\" WHERE \"Id\" = @id";
-
-                using var command = new NpgsqlCommand(commandText, connection);
-                command.Parameters.AddWithValue("@id", id);
-
-                int numberOfCommits = command.ExecuteNonQuery();
-
-                if (numberOfCommits == 0)
-                {
-                    return NotFound("CarType not found");
-                }
-                connection.Close();
-
-                return NoContent();
+                return Ok();
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error: {ex.Message}");
-            }
+            return BadRequest("Car type not found!");
         }
     }
 }
