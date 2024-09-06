@@ -48,7 +48,7 @@ namespace IntroductionWebAPI.Controllers
             }
         }
 
-        //[HttpGet]
+        [HttpGet]
         [Route("GetCarTypeName/{id}")]
         public IActionResult GetById(Guid id)
         {
