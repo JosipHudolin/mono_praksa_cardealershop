@@ -1,11 +1,6 @@
 ﻿using Introduction.Model;
 using Introduction.Service;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
-using System.Linq;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 
 namespace IntroductionWebAPI.Controllers
 {
@@ -15,12 +10,13 @@ namespace IntroductionWebAPI.Controllers
     {
         [HttpGet]
         [Route("getCars")]
-        public IActionResult GetAllCars()
+        public async Task<IActionResult> GetAllCars()
         {
             var service = new CarService();
-            if (service.GetAllCars() != null)
+            var currentCar = await service.GetAllCars();
+            if (currentCar != null)
             {
-                return Ok(service.GetAllCars());
+                return Ok(currentCar);
             }
             return BadRequest();
         }
@@ -29,22 +25,23 @@ namespace IntroductionWebAPI.Controllers
 
         [HttpGet]
         [Route("getCarById/{id}")]
-        public IActionResult GetCarById(Guid id)
+        public async Task<IActionResult> GetCarById(Guid id)
         {
             var service = new CarService();
-            if (service.GetCarById(id) != null)
+            var currentCar = await service.GetCarById(id);
+            if (currentCar != null)
             {
-                return Ok(service.GetCarById(id));
+                return Ok(currentCar);
             }
             return BadRequest();
         }
 
         [HttpPost]
         [Route("inputCar")]
-        public IActionResult InputCar([FromBody] Car car)
+        public async Task<IActionResult> InputCar([FromBody] Car car)
         {
             var service = new CarService();
-            if (service.InputCar(car))
+            if (await service.InputCar(car))
             {
                 return Ok();
             }
@@ -53,10 +50,10 @@ namespace IntroductionWebAPI.Controllers
 
         [HttpPut]
         [Route("updateCarMileage/{id}")]
-        public IActionResult UpdateCarMileage(Guid id, [FromBody] CarUpdate car )
+        public async Task<IActionResult> UpdateCarMileage(Guid id, [FromBody] CarUpdate car )
         {
             var service = new CarService();
-            if (service.UpdateCarMileage(id, car))
+            if (await service.UpdateCarMileage(id, car))
             {
                 return Ok();
             }
@@ -65,10 +62,10 @@ namespace IntroductionWebAPI.Controllers
 
         [HttpPut]
         [Route("updateCarDescription/{id}")]
-        public IActionResult UpdateCarDescription([FromBody] CarUpdate car, Guid id)
+        public async Task<IActionResult> UpdateCarDescription([FromBody] CarUpdate car, Guid id)
         {
             var service = new CarService();
-            if (service.UpdateCarDescription(car, id))
+            if (await service.UpdateCarDescription(car, id))
             {
                 return Ok();
             }
@@ -77,10 +74,10 @@ namespace IntroductionWebAPI.Controllers
 
         [HttpPut]
         [Route("updateCar/{id}")]
-        public IActionResult UpdateCar([FromBody] CarUpdate car, Guid id)
+        public async Task<IActionResult> UpdateCar([FromBody] CarUpdate car, Guid id)
         {
             var service = new CarService();
-            if (service.UpdateCar(car, id))
+            if (await service.UpdateCar(car, id))
             {
                 return Ok();
             }
@@ -90,10 +87,10 @@ namespace IntroductionWebAPI.Controllers
         [HttpDelete]
         [Route("deleteCar/{id}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult DeleteCar(Guid id)
+        public async Task<IActionResult> DeleteCar(Guid id)
         {
             var service = new CarService();
-            if (service.DeleteCar(id))
+            if (await service.DeleteCar(id))
             {
                 return Ok();
             }

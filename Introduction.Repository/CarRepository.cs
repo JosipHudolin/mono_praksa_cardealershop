@@ -13,7 +13,7 @@ namespace Introduction.Repository
     {
 
         private const string CONNECTION_STRING = "Host=localhost:5432;Username=postgres;Password=postgres;Database=car-dealershop";
-        public Car GetCarById(Guid id)
+        public async Task<Car> GetCarById(Guid id)
         {
             try
             {
@@ -24,11 +24,11 @@ namespace Introduction.Repository
 
                 command.Parameters.AddWithValue("@id", id);
                 connection.Open();
-                using NpgsqlDataReader reader = command.ExecuteReader();
+                using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
 
                 if (reader.HasRows)
                 {
-                    reader.Read();
+                    await reader.ReadAsync();
 
                     car.Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString());
                     car.Make = reader.IsDBNull(1) ? null : reader[1].ToString();
@@ -56,7 +56,7 @@ namespace Introduction.Repository
             }
         }
 
-        public List<Car> GetAllCars()
+        public async Task<List<Car>> GetAllCars()
         {
             try
             {
@@ -69,11 +69,11 @@ namespace Introduction.Repository
                 using var command = new NpgsqlCommand(commandText, connection);
 
                 connection.Open();
-                using NpgsqlDataReader reader = command.ExecuteReader();
+                using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
 
                 if (reader.HasRows)
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         var car = new Car
                         {
@@ -109,7 +109,7 @@ namespace Introduction.Repository
             }
         }
 
-        public bool InputCar(Car car)
+        public async Task<bool> InputCar(Car car)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace Introduction.Repository
                 command.Parameters.AddWithValue("@description", car.Description);
                 command.Parameters.AddWithValue("@inputDate", NpgsqlTypes.NpgsqlDbType.Date, DateOnly.FromDateTime(DateTime.Now));
 
-                int numberOfCommits = command.ExecuteNonQuery();
+                int numberOfCommits = await command.ExecuteNonQueryAsync();
 
                 if (numberOfCommits == 0)
                 {
@@ -146,7 +146,7 @@ namespace Introduction.Repository
             }
         }
 
-        public bool UpdateCarMileage(Guid id, CarUpdate car)
+        public async Task<bool> UpdateCarMileage(Guid id, CarUpdate car)
         {
             try
             {
@@ -161,7 +161,7 @@ namespace Introduction.Repository
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@mileage", car.Mileage);
 
-                int numberOfCommits = command.ExecuteNonQuery();
+                int numberOfCommits = await command.ExecuteNonQueryAsync();
 
                 if (numberOfCommits == 0)
                 {
@@ -176,7 +176,7 @@ namespace Introduction.Repository
             }
         }
 
-        public bool UpdateCarDescription(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarDescription(CarUpdate car, Guid id)
         {
             try
             {
@@ -189,7 +189,7 @@ namespace Introduction.Repository
                 command.Parameters.AddWithValue("@id", id);
                 command.Parameters.AddWithValue("@description", car.Description);
 
-                int numberOfCommits = command.ExecuteNonQuery();
+                int numberOfCommits = await command.ExecuteNonQueryAsync();
 
                 if (numberOfCommits == 0)
                 {
@@ -204,7 +204,7 @@ namespace Introduction.Repository
             }
         }
 
-        public bool UpdateCar(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCar(CarUpdate car, Guid id)
         {
             try
             {
@@ -214,12 +214,14 @@ namespace Introduction.Repository
                 using var command = new NpgsqlCommand(commandText, connection);
                 var sb = new StringBuilder();
                 sb.Append(commandText);
-                if (!string.IsNullOrWhiteSpace(car.Description) && !string.Equals(car.Description, GetById(id).Description))
+                var currentCar = await GetById(id);
+                if (currentCar == null) { return false; }
+                if (!string.IsNullOrWhiteSpace(car.Description) && !string.Equals(car.Description, currentCar.Description))
                 {
                     sb.Append("\"Description\" = @description,");
                     command.Parameters.AddWithValue("@description", car.Description);
                 }
-                if (car.Mileage != 0 && car.Mileage != GetById(id).Mileage)
+                if (car.Mileage != 0 && car.Mileage != currentCar.Mileage)
                 {
                     sb.Append("\"Mileage\" = @mileag,");
                     command.Parameters.AddWithValue("@mileage", car.Mileage);
@@ -231,7 +233,7 @@ namespace Introduction.Repository
 
                 command.Parameters.AddWithValue("@id", id);
 
-                int numberOfCommits = command.ExecuteNonQuery();
+                int numberOfCommits = await command.ExecuteNonQueryAsync();
 
                 if (numberOfCommits == 0)
                 {
@@ -246,7 +248,7 @@ namespace Introduction.Repository
             }
         }
 
-        public bool DeleteCar(Guid id)
+        public async Task<bool> DeleteCar(Guid id)
         {
             try
             {
@@ -260,7 +262,7 @@ namespace Introduction.Repository
 
                 command.Parameters.AddWithValue("@id", id);
 
-                int numberOfCommits = command.ExecuteNonQuery();
+                int numberOfCommits = await command.ExecuteNonQueryAsync();
 
                 if (numberOfCommits == 0)
                 {
@@ -275,7 +277,7 @@ namespace Introduction.Repository
             }
         }
 
-        public Car GetById(Guid id)
+        public async Task<Car> GetById(Guid id)
         {
             try
             {
@@ -286,7 +288,7 @@ namespace Introduction.Repository
 
                 command.Parameters.AddWithValue("@id", id);
                 connection.Open();
-                using NpgsqlDataReader reader = command.ExecuteReader();
+                using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
 
                 if (reader.HasRows)
                 {

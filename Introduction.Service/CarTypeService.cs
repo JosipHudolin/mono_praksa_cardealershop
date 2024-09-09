@@ -12,12 +12,13 @@ namespace Introduction.Service
 {
     public class CarTypeService: ICarTypeService
     {
-        public List<CarType> Get()
+        public async Task<List<CarType>> Get()
         {
             var repository = new CarTypeRepository();
-            if (repository.Get() != null && repository.Get().Count > 0)
+            var currentCarTypes = await repository.Get();
+            if (currentCarTypes != null && currentCarTypes.Count > 0)
             {
-                return repository.Get();
+                return currentCarTypes;
             }
             else
             {
@@ -25,12 +26,13 @@ namespace Introduction.Service
             }
         }
 
-        public CarType GetById(Guid id)
+        public async Task<CarType> GetById(Guid id)
         {
             var repository = new CarTypeRepository();
-            if (repository.GetById(id) != null)
+            var currentCarType = await repository.GetById(id);
+            if (currentCarType != null)
             {
-                return repository.GetById(id);
+                return currentCarType;
             }
             else
             {
@@ -38,22 +40,22 @@ namespace Introduction.Service
             }
         }
 
-        public bool InputCarType(CarType carType)
+        public async Task<bool> InputCarType(CarType carType)
         {
             var repository = new CarTypeRepository();
-            return repository.InputCarType(carType);
+            return await repository.InputCarType(carType);
         }
 
-        public bool UpdateNameById(Guid id, string name)
+        public async Task<bool> UpdateNameById(Guid id, string name)
         {
             var repository = new CarTypeRepository();
-            return repository.UpdateNameById(id, name);
+            return await repository.UpdateNameById(id, name);
         }
 
-        public bool Delete(Guid id)
+        public async Task<bool> Delete(Guid id)
         {
             var repository = new CarTypeRepository();
-            return repository.Delete(id);
+            return await repository.Delete(id);
         }
     }
 }
