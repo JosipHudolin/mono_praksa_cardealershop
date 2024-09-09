@@ -210,10 +210,9 @@ namespace Introduction.Repository
             {
                 using var connection = new NpgsqlConnection(CONNECTION_STRING);
                 connection.Open();
-                string commandText = "UPDATE \"Car\" SET ";
-                using var command = new NpgsqlCommand(commandText, connection);
                 var sb = new StringBuilder();
-                sb.Append(commandText);
+                using var command = new NpgsqlCommand(sb.ToString(), connection);
+                sb.Append("UPDATE \"Car\" SET ");
                 var currentCar = await GetById(id);
                 if (currentCar == null) { return false; }
                 if (!string.IsNullOrWhiteSpace(car.Description) && !string.Equals(car.Description, currentCar.Description))
@@ -223,14 +222,12 @@ namespace Introduction.Repository
                 }
                 if (car.Mileage != 0 && car.Mileage != currentCar.Mileage)
                 {
-                    sb.Append("\"Mileage\" = @mileag,");
+                    sb.Append("\"Mileage\" = @mileage,");
                     command.Parameters.AddWithValue("@mileage", car.Mileage);
                 }
-                sb.Remove(1, sb.Length - 1);
-
+                sb.Length -= 1;
                 sb.Append(" WHERE \"Id\" = @id");
-
-
+                command.CommandText = sb.ToString();
                 command.Parameters.AddWithValue("@id", id);
 
                 int numberOfCommits = await command.ExecuteNonQueryAsync();
