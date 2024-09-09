@@ -6,12 +6,13 @@ namespace Introduction.Service
 {
     public class CarService: ICarService
     {
-        public Car GetCarById(Guid id)
+        public async Task<Car> GetCarById(Guid id)
         {
             var repository = new CarRepository();
-            if (repository.GetCarById(id) != null)
+            var currentCar = repository.GetCarById(id);
+            if (currentCar != null)
             {
-                return repository.GetCarById(id);
+                return await currentCar;
             }
             else
             {
@@ -19,12 +20,13 @@ namespace Introduction.Service
             }
         }
 
-        public List<Car> GetAllCars()
+        public async Task<List<Car>> GetAllCars()
         {
             var repository = new CarRepository();
-            if (repository.GetAllCars() != null && repository.GetAllCars().Count > 0)
+            var currentCars = await repository.GetAllCars();
+            if (currentCars != null && currentCars.Count > 0)
             {
-                return repository.GetAllCars();
+                return currentCars;
             }
             else
             {
@@ -32,34 +34,34 @@ namespace Introduction.Service
             }
         }
 
-        public bool InputCar(Car car)
+        public async Task<bool> InputCar(Car car)
         {
             var repository = new CarRepository();
-            return repository.InputCar(car);
+            return await repository.InputCar(car);
         }
 
-        public bool UpdateCarMileage(Guid id, CarUpdate car)
+        public async Task<bool> UpdateCarMileage(Guid id, CarUpdate car)
         {
             var repository = new CarRepository();
-            return repository.UpdateCarMileage(id, car);
+            return await repository.UpdateCarMileage(id, car);
         }
 
-        public bool UpdateCarDescription(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarDescription(CarUpdate car, Guid id)
         {
             var repository = new CarRepository();
-            return repository.UpdateCarDescription(car, id);
+            return await repository.UpdateCarDescription(car, id);
         }
 
-        public bool UpdateCar(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCar(CarUpdate car, Guid id)
         {
             var repository = new CarRepository();
-            return repository.UpdateCar(car, id);
+            return await repository.UpdateCar(car, id);
         }
 
-        public bool DeleteCar(Guid id)
+        public async Task<bool> DeleteCar(Guid id)
         {
             var repository = new CarRepository();
-            return repository.DeleteCar(id);
+            return await repository.DeleteCar(id);
         }
     }
 }
