@@ -1,5 +1,5 @@
 ﻿using Introduction.Model;
-using Introduction.Service;
+using Introduction.Service.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntroductionWebAPI.Controllers
@@ -8,12 +8,18 @@ namespace IntroductionWebAPI.Controllers
     [ApiController]
     public class CarTypeController : ControllerBase
     {
+        ICarTypeService _carTypeService;
+
+        public CarTypeController(ICarTypeService carTypeService)
+        {
+            _carTypeService = carTypeService;
+        }
+
         [HttpGet]
         [Route("getCarTypeName")]
         public async Task<IActionResult> Get()
         {
-            var service = new CarTypeService();
-            var currentCarTypes = await service.Get();
+            var currentCarTypes = await _carTypeService.Get();
             if (currentCarTypes != null)
             {
                 return Ok(currentCarTypes);
@@ -25,8 +31,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("GetCarTypeName/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var service = new CarTypeService();
-            var currentCar = await service.GetById(id);
+            var currentCar = await _carTypeService.GetById(id);
             if (currentCar != null)
             {
                 return Ok(currentCar);
@@ -38,8 +43,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("insertCarType")]
         public async Task<IActionResult> InputCarType([FromBody] CarType carType)
         {
-            var service = new CarTypeService();
-            if (await service.InputCarType(carType))
+            if (await _carTypeService.InputCarType(carType))
             {
                 return Ok();
             }
@@ -50,8 +54,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("updateCarTypeName/{id}")]
         public async Task<IActionResult> UpdateNameById(Guid id, [FromBody] string name)
         {
-            var service = new CarTypeService();
-            if (await service.UpdateNameById(id, name))
+            if (await _carTypeService.UpdateNameById(id, name))
             {
                 return Ok();
             }
@@ -62,8 +65,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("deleteCarType/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var service = new CarTypeService();
-            if (await service.Delete(id))
+            if (await _carTypeService.Delete(id))
             {
                 return Ok();
             }

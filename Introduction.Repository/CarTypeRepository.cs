@@ -1,11 +1,6 @@
 ﻿using Introduction.Model;
 using Introduction.Repository.Common;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Introduction.Repository
 {
@@ -41,7 +36,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return carTypes;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -74,7 +69,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return carType;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -105,7 +100,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -133,7 +128,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -161,7 +156,7 @@ namespace Introduction.Repository
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
