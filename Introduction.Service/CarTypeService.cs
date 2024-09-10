@@ -38,6 +38,18 @@ namespace Introduction.Service
                 return null;
             }
         }
+        public async Task<List<Car>> GetCars(Guid id)
+        {
+            var currentCarTypes = await _carTypeRepository.GetCars(id);
+            if (currentCarTypes != null && currentCarTypes.Count > 0)
+            {
+                return currentCarTypes;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public async Task<bool> InputCarType(CarType carType)
         {

@@ -16,13 +16,25 @@ namespace IntroductionWebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("getCarTypeName")]
+        [Route("getCarTypes")]
         public async Task<IActionResult> Get()
         {
             var currentCarTypes = await _carTypeService.Get();
             if (currentCarTypes != null)
             {
                 return Ok(currentCarTypes);
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("getCars")]
+        public async Task<IActionResult> GetCars(Guid id)
+        {
+            var currentCars = await _carTypeService.GetCars(id);
+            if (currentCars != null)
+            {
+                return Ok(currentCars);
             }
             return BadRequest();
         }

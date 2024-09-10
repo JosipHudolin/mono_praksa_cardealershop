@@ -42,6 +42,57 @@ namespace Introduction.Repository
             }
         }
 
+        public async Task<List<Car>> GetCars(Guid id)
+        {
+            try
+            {
+                List<Car> cars = new List<Car>();
+
+                using var connection = new NpgsqlConnection(CONNECTION_STRING);
+                var commandText = @"SELECT c.""Id"", c.""Make"", c.""Model"", c.""Year"", c.""Mileage"", c.""Description"", c.""InputDate"", 
+                                   ct.""Id"" as ""CarTypeId"", ct.""Name"" as ""CarTypeName""
+                            FROM ""Car"" c
+                            JOIN ""CarType"" ct ON c.""CarTypeId"" = ct.""Id""
+                            WHERE ct.""Id"" = @carTypeId;";
+
+                using var command = new NpgsqlCommand(commandText, connection);
+                command.Parameters.AddWithValue("@carTypeId", id);
+
+                connection.Open();
+                using var reader = await command.ExecuteReaderAsync();
+
+                if (reader.HasRows)
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var car = new Car
+                        {
+                            Id = reader.IsDBNull(reader.GetOrdinal("Id")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("Id")),
+                            Make = reader.IsDBNull(reader.GetOrdinal("Make")) ? null : reader.GetString(reader.GetOrdinal("Make")),
+                            Model = reader.IsDBNull(reader.GetOrdinal("Model")) ? null : reader.GetString(reader.GetOrdinal("Model")),
+                            Year = reader.IsDBNull(reader.GetOrdinal("Year")) ? 0 : reader.GetInt32(reader.GetOrdinal("Year")),
+                            Mileage = reader.IsDBNull(reader.GetOrdinal("Mileage")) ? 0 : reader.GetInt32(reader.GetOrdinal("Mileage")),
+                            Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description")),
+                            InputDate = reader.IsDBNull(reader.GetOrdinal("InputDate")) ? (DateOnly?)null : reader.GetFieldValue<DateOnly?>(reader.GetOrdinal("InputDate")),
+                            CarType = new CarType
+                            {
+                                Id = reader.GetGuid(reader.GetOrdinal("CarTypeId")),
+                                Name = reader.IsDBNull(reader.GetOrdinal("CarTypeName")) ? null : reader.GetString(reader.GetOrdinal("CarTypeName"))
+                            }
+                        };
+
+                        cars.Add(car);
+                    }
+                }
+
+                return cars;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<CarType> GetById(Guid id)
         {
             try
