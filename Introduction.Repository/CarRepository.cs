@@ -1,11 +1,7 @@
 ﻿using Introduction.Model;
 using Introduction.Repository.Common;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Introduction.Repository
 {
@@ -18,6 +14,7 @@ namespace Introduction.Repository
             try
             {
                 var car = new Car();
+                var carType = new CarType();
                 using var connection = new NpgsqlConnection(CONNECTION_STRING);
                 string commandText = "SELECT c.\"Id\", c.\"Make\", c.\"Model\", c.\"Year\", c.\"Mileage\", c.\"Description\", c.\"InputDate\", \r\n       ct.\"Id\" as \"CarTypeId\", ct.\"Name\" as \"CarTypeName\"\r\nFROM \"Car\" c\r\nLEFT JOIN \"CarType\" ct ON c.\"CarTypeId\" = ct.\"Id\"\r\nWHERE c.\"Id\" = @id;\r\n";
                 using var command = new NpgsqlCommand(commandText, connection);
@@ -33,15 +30,16 @@ namespace Introduction.Repository
                     car.Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString());
                     car.Make = reader.IsDBNull(1) ? null : reader[1].ToString();
                     car.Model = reader.IsDBNull(reader.GetOrdinal("Model")) ? null : reader["Model"].ToString();
+                    car.Year = reader.IsDBNull(reader.GetOrdinal("Year")) ? 0 : reader.GetInt32(reader.GetOrdinal("Year"));
+                    car.Mileage = reader.IsDBNull(reader.GetOrdinal("Mileage")) ? 0 : reader.GetInt32(reader.GetOrdinal("Mileage"));
+                    car.Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description"));
+                    car.InputDate = reader.IsDBNull(reader.GetOrdinal("InputDate")) ? (DateOnly?)null : reader.GetFieldValue<DateOnly?>(reader.GetOrdinal("InputDate"));
                     car.CarType = reader.IsDBNull(reader.GetOrdinal("CarTypeId")) ? null : new CarType
                     {
                         Id = reader.GetGuid(reader.GetOrdinal("CarTypeId")),
                         Name = reader.IsDBNull(reader.GetOrdinal("CarTypeName")) ? null : reader.GetString(reader.GetOrdinal("CarTypeName"))
                     };
-                    car.Year = reader.IsDBNull(reader.GetOrdinal("Year")) ? 0 : reader.GetInt32(reader.GetOrdinal("Year"));
-                    car.Mileage = reader.IsDBNull(reader.GetOrdinal("Mileage")) ? 0 : reader.GetInt32(reader.GetOrdinal("Mileage"));
-                    car.Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description"));
-                    car.InputDate = reader.IsDBNull(reader.GetOrdinal("InputDate")) ? (DateOnly?)null : reader.GetFieldValue<DateOnly?>(reader.GetOrdinal("InputDate"));
+                    car.CarTypeId = reader.IsDBNull(reader.GetOrdinal("CarTypeId")) ? Guid.Empty : Guid.Parse(reader["CarTypeId"].ToString());
                 }
                 else
                 {
@@ -50,7 +48,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return car;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -80,6 +78,7 @@ namespace Introduction.Repository
                             Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString()),
                             Make = reader.IsDBNull(1) ? null : reader[1].ToString(),
                             Model = reader.IsDBNull(reader.GetOrdinal("Model")) ? null : reader["Model"].ToString(),
+                            CarTypeId = reader.IsDBNull(reader.GetOrdinal("CarTypeId")) ? Guid.Empty : Guid.Parse(reader["CarTypeId"].ToString()),
                             CarType = reader.IsDBNull(reader.GetOrdinal("CarTypeId")) ? null : new CarType
                             {
                                 Id = reader.GetGuid(reader.GetOrdinal("CarTypeId")),
@@ -103,7 +102,7 @@ namespace Introduction.Repository
 
                 return cars;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -124,7 +123,7 @@ namespace Introduction.Repository
                 command.Parameters.AddWithValue("@id", NpgsqlTypes.NpgsqlDbType.Uuid, Guid.NewGuid());
                 command.Parameters.AddWithValue("@make", car.Make);
                 command.Parameters.AddWithValue("@model", car.Model);
-                command.Parameters.AddWithValue("@carTypeId", NpgsqlTypes.NpgsqlDbType.Uuid, car.CarType.Id);
+                command.Parameters.AddWithValue("@carTypeId", NpgsqlTypes.NpgsqlDbType.Uuid, car.CarTypeId);
                 command.Parameters.AddWithValue("@year", car.Year);
                 command.Parameters.AddWithValue("@mileage", car.Mileage);
                 command.Parameters.AddWithValue("@description", car.Description);
@@ -137,64 +136,6 @@ namespace Introduction.Repository
                     return false;
                 }
 
-                connection.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> UpdateCarMileage(Guid id, CarUpdate car)
-        {
-            try
-            {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-
-                string commandText = "UPDATE \"Car\" SET \"Mileage\" = @mileage WHERE \"Id\" = @id;";
-
-                connection.Open();
-
-                using var command = new NpgsqlCommand(commandText, connection);
-
-                command.Parameters.AddWithValue("@id", id);
-                command.Parameters.AddWithValue("@mileage", car.Mileage);
-
-                int numberOfCommits = await command.ExecuteNonQueryAsync();
-
-                if (numberOfCommits == 0)
-                {
-                    return false;
-                }
-                connection.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> UpdateCarDescription(CarUpdate car, Guid id)
-        {
-            try
-            {
-                using var connection = new NpgsqlConnection(CONNECTION_STRING);
-                connection.Open();
-
-                string commandText = "UPDATE \"Car\" SET \"Description\" = @description WHERE \"Id\" = @id;";
-
-                using var command = new NpgsqlCommand(commandText, connection);
-                command.Parameters.AddWithValue("@id", id);
-                command.Parameters.AddWithValue("@description", car.Description);
-
-                int numberOfCommits = await command.ExecuteNonQueryAsync();
-
-                if (numberOfCommits == 0)
-                {
-                    return false;
-                }
                 connection.Close();
                 return true;
             }
@@ -239,7 +180,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -268,7 +209,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -294,11 +235,7 @@ namespace Introduction.Repository
                     car.Id = reader.IsDBNull(0) ? Guid.Empty : Guid.Parse(reader[0].ToString());
                     car.Make = reader.IsDBNull(1) ? null : reader[1].ToString();
                     car.Model = reader.IsDBNull(reader.GetOrdinal("Model")) ? null : reader["Model"].ToString();
-                    car.CarType = reader.IsDBNull(reader.GetOrdinal("CarTypeId")) ? null : new CarType
-                    {
-                        Id = reader.GetGuid(reader.GetOrdinal("CarTypeId")),
-                        Name = reader.IsDBNull(reader.GetOrdinal("CarTypeName")) ? null : reader.GetString(reader.GetOrdinal("CarTypeName"))
-                    };
+                    car.CarTypeId = reader.IsDBNull(3) ? Guid.Empty : Guid.Parse(reader[0].ToString());
                     car.Year = reader.IsDBNull(reader.GetOrdinal("Year")) ? 0 : reader.GetInt32(reader.GetOrdinal("Year"));
                     car.Mileage = reader.IsDBNull(reader.GetOrdinal("Mileage")) ? 0 : reader.GetInt32(reader.GetOrdinal("Mileage"));
                     car.Description = reader.IsDBNull(reader.GetOrdinal("Description")) ? null : reader.GetString(reader.GetOrdinal("Description"));
@@ -307,7 +244,7 @@ namespace Introduction.Repository
                 connection.Close();
                 return car;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

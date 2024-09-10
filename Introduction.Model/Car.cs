@@ -4,9 +4,9 @@
     {
         public Guid? Id { get; set; }
         public string? Make { get; set; }
-
         public string? Model { get; set; }
-        public Guid? CarType { get; set; }
+        public Guid? CarTypeId { get; set; }
+        public CarType? CarType { get; set; }
         public int? Year { get; set; }
         public int? Mileage { get; set; }
         public string? Description { get; set; }
