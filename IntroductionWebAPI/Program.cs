@@ -17,10 +17,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-    containerBuilder.RegisterType<CarService>().As<ICarService>();
-    containerBuilder.RegisterType<CarTypeService>().As<ICarTypeService>();
-    containerBuilder.RegisterType<CarRepository>().As<ICarRepository>();
-    containerBuilder.RegisterType<CarTypeRepository>().As<ICarTypeRepository>();
+    containerBuilder.RegisterModule<RepositoryDIModule>();
+    containerBuilder.RegisterModule<ServiceDIModule>();
 });
 var app = builder.Build();
 
