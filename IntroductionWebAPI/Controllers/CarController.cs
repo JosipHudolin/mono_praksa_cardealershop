@@ -1,5 +1,5 @@
 ﻿using Introduction.Model;
-using Introduction.Service;
+using Introduction.Service.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntroductionWebAPI.Controllers
@@ -8,12 +8,18 @@ namespace IntroductionWebAPI.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
+        ICarService _carService;
+
+        public CarController(ICarService carService)
+        {
+            _carService = carService;
+        }
+
         [HttpGet]
         [Route("getCars")]
         public async Task<IActionResult> GetAllCars()
         {
-            var service = new CarService();
-            var currentCar = await service.GetAllCars();
+            var currentCar = await _carService.GetAllCars();
             if (currentCar != null)
             {
                 return Ok(currentCar);
@@ -27,8 +33,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("getCarById/{id}")]
         public async Task<IActionResult> GetCarById(Guid id)
         {
-            var service = new CarService();
-            var currentCar = await service.GetCarById(id);
+            var currentCar = await _carService.GetCarById(id);
             if (currentCar != null)
             {
                 return Ok(currentCar);
@@ -40,8 +45,7 @@ namespace IntroductionWebAPI.Controllers
         [Route("inputCar")]
         public async Task<IActionResult> InputCar([FromBody] Car car)
         {
-            var service = new CarService();
-            if (await service.InputCar(car))
+            if (await _carService.InputCar(car))
             {
                 return Ok();
             }
@@ -49,35 +53,10 @@ namespace IntroductionWebAPI.Controllers
         }
 
         [HttpPut]
-        [Route("updateCarMileage/{id}")]
-        public async Task<IActionResult> UpdateCarMileage(Guid id, [FromBody] CarUpdate car )
-        {
-            var service = new CarService();
-            if (await service.UpdateCarMileage(id, car))
-            {
-                return Ok();
-            }
-            return BadRequest("Car not found!");
-        }
-
-        [HttpPut]
-        [Route("updateCarDescription/{id}")]
-        public async Task<IActionResult> UpdateCarDescription([FromBody] CarUpdate car, Guid id)
-        {
-            var service = new CarService();
-            if (await service.UpdateCarDescription(car, id))
-            {
-                return Ok();
-            }
-            return BadRequest("Car not found!");
-        }
-
-        [HttpPut]
         [Route("updateCar/{id}")]
         public async Task<IActionResult> UpdateCar([FromBody] CarUpdate car, Guid id)
         {
-            var service = new CarService();
-            if (await service.UpdateCar(car, id))
+            if (await _carService.UpdateCar(car, id))
             {
                 return Ok();
             }
@@ -89,8 +68,7 @@ namespace IntroductionWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteCar(Guid id)
         {
-            var service = new CarService();
-            if (await service.DeleteCar(id))
+            if (await _carService.DeleteCar(id))
             {
                 return Ok();
             }
