@@ -1,4 +1,5 @@
-﻿using Introduction.Model;
+﻿using Introduction.Common;
+using Introduction.Model;
 using Introduction.Repository.Common;
 using Introduction.Service.Common;
 
@@ -13,15 +14,15 @@ namespace Introduction.Service
             _carRepository = carRepository;
         }
 
-        public async Task<Car> GetCarById(Guid id)
+        public async Task<Car> GetCarByIdAsync(Guid id)
         {
-            var currentCar = _carRepository.GetCarById(id);
+            var currentCar = _carRepository.GetCarByIdAsync(id);
             return await currentCar;
         }
 
-        public async Task<List<Car>> GetAllCars()
+        public async Task<List<Car>> GetAllCarsAsync(AddFilter filter, Paging paging, Sorting sorting)
         {
-            var currentCars = await _carRepository.GetAllCars();
+            var currentCars = await _carRepository.GetAllCarsAsync(filter, paging, sorting);
             if (currentCars != null && currentCars.Count > 0)
             {
                 return currentCars;
@@ -32,19 +33,19 @@ namespace Introduction.Service
             }
         }
 
-        public async Task<bool> InputCar(Car car)
+        public async Task<bool> InputCarAsync(Car car)
         {
-            return await _carRepository.InputCar(car);
+            return await _carRepository.InputCarAsync(car);
         }
 
-        public async Task<bool> UpdateCar(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarAsync(CarUpdate car, Guid id)
         {
-            return await _carRepository.UpdateCar(car, id);
+            return await _carRepository.UpdateCarAsync(car, id);
         }
 
-        public async Task<bool> DeleteCar(Guid id)
+        public async Task<bool> DeleteCarAsync(Guid id)
         {
-            return await _carRepository.DeleteCar(id);
+            return await _carRepository.DeleteCarAsync(id);
         }
     }
 }

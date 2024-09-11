@@ -13,9 +13,9 @@ namespace Introduction.Service
             _carTypeRepository = carTypeRepository;
         }
 
-        public async Task<List<CarType>> Get()
+        public async Task<List<CarType>> GetAsync()
         {
-            var currentCarTypes = await _carTypeRepository.Get();
+            var currentCarTypes = await _carTypeRepository.GetAsync();
             if (currentCarTypes != null && currentCarTypes.Count > 0)
             {
                 return currentCarTypes;
@@ -26,9 +26,9 @@ namespace Introduction.Service
             }
         }
 
-        public async Task<CarType> GetById(Guid id)
+        public async Task<CarType> GetByIdAsync(Guid id)
         {
-            var currentCarType = await _carTypeRepository.GetById(id);
+            var currentCarType = await _carTypeRepository.GetByIdAsync(id);
             if (currentCarType != null)
             {
                 return currentCarType;
@@ -38,9 +38,9 @@ namespace Introduction.Service
                 return null;
             }
         }
-        public async Task<List<Car>> GetCars(Guid id)
+        public async Task<List<Car>> GetCarsAsync(Guid id)
         {
-            var currentCarTypes = await _carTypeRepository.GetCars(id);
+            var currentCarTypes = await _carTypeRepository.GetCarsAsync(id);
             if (currentCarTypes != null && currentCarTypes.Count > 0)
             {
                 return currentCarTypes;
@@ -51,19 +51,19 @@ namespace Introduction.Service
             }
         }
 
-        public async Task<bool> InputCarType(CarType carType)
+        public async Task<bool> InputCarTypeAsync(CarType carType)
         {
-            return await _carTypeRepository.InputCarType(carType);
+            return await _carTypeRepository.InputCarTypeAsync(carType);
         }
 
-        public async Task<bool> UpdateNameById(Guid id, string name)
+        public async Task<bool> UpdateNameByIdAsync(Guid id, string name)
         {
-            return await _carTypeRepository.UpdateNameById(id, name);
+            return await _carTypeRepository.UpdateNameByIdAsync(id, name);
         }
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            return await _carTypeRepository.Delete(id);
+            return await _carTypeRepository.DeleteAsync(id);
         }
     }
 }

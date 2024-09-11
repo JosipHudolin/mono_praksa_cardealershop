@@ -4,11 +4,11 @@ namespace Introduction.Repository.Common
 {
     public interface ICarTypeRepository
     {
-        Task<List<CarType>> Get();
-        Task<CarType> GetById(Guid id);
-        Task<List<Car>> GetCars(Guid id);
-        Task<bool> InputCarType(CarType carType);
-        Task<bool> UpdateNameById(Guid id, string name);
-        Task<bool> Delete(Guid id);
+        Task<List<CarType>> GetAsync();
+        Task<CarType> GetByIdAsync(Guid id);
+        Task<List<Car>> GetCarsAsync(Guid id);
+        Task<bool> InputCarTypeAsync(CarType carType);
+        Task<bool> UpdateNameByIdAsync(Guid id, string name);
+        Task<bool> DeleteAsync(Guid id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Introduction.Model;
+﻿using Introduction.Common;
+using Introduction.Model;
 using Introduction.Repository.Common;
 using Npgsql;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Introduction.Repository
     {
 
         private const string CONNECTION_STRING = "Host=localhost:5432;Username=postgres;Password=postgres;Database=car-dealershop";
-        public async Task<Car> GetCarById(Guid id)
+        public async Task<Car> GetCarByIdAsync(Guid id)
         {
             try
             {
@@ -54,7 +55,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<List<Car>> GetAllCars()
+        public async Task<List<Car>> GetAllCarsAsync(AddFilter filter, Paging paging, Sorting sorting)
         {
             try
             {
@@ -63,8 +64,74 @@ namespace Introduction.Repository
                 var commandText = @"SELECT c.""Id"", c.""Make"", c.""Model"", c.""Year"", c.""Mileage"", c.""Description"", c.""InputDate"", 
                                    ct.""Id"" as ""CarTypeId"", ct.""Name"" as ""CarTypeName""
                             FROM ""Car"" c
-                            LEFT JOIN ""CarType"" ct ON c.""CarTypeId"" = ct.""Id"";";
+                            LEFT JOIN ""CarType"" ct ON c.""CarTypeId"" = ct.""Id"" WHERE 1=1 ";
+                
+                var sb = new StringBuilder(commandText);
+                if (!string.IsNullOrWhiteSpace(filter.Make))
+                {
+                    sb.Append($" AND c.\"Make\" = @filterMake");
+                }
+                if (!string.IsNullOrWhiteSpace(filter.Model))
+                {
+                    sb.Append($" AND c.\"Model\" = @filterModel");
+                }
+                if (filter.YearFrom != 0 && filter.YearTo != 0)
+                {
+                    sb.Append($" AND c.\"Year\" > @filterYearFrom AND c.\"Year\" < @filterYearTo");
+                }
+                if (filter.YearFrom != 0 && filter.YearTo == 0)
+                {
+                    sb.Append($" AND c.\"Year\" > @filterYearFrom");
+                }
+                if (filter.YearFrom == 0 && filter.YearTo != 0)
+                {
+                    sb.Append($" AND c.\"Year\" < @filterYearTo");
+                }
+                if (filter.MileageFrom != 0 && filter.MileageTo != 0)
+                {
+                    sb.Append($" AND c.\"Mileage\" > @filterMileageFrom AND c.\"Mileage\" < @filterMileageTo");
+                }
+                if (filter.MileageFrom != 0 && filter.MileageTo == 0)
+                {
+                    sb.Append($" AND c.\"Mileage\" > @filterMileageFrom");
+                }
+                if (filter.MileageFrom == 0 && filter.MileageTo != 0)
+                {
+                    sb.Append($" AND c.\"Mileage\" < @filterMileageTo");
+                }
+                if (!string.IsNullOrWhiteSpace(filter.SearchQuery))
+                {
+                    sb.Append(" AND (\"Description\" ILIKE @searchQuery OR \"Make\" ILIKE @searchQuery OR \"Model\" ILIKE @searchQuery)");
+                }
+                if (filter.CarTypeId != null)
+                {
+                    sb.Append($" AND \"CarTypeId\" = @filterCarTypeId");
+                }
+
+                if (sorting != null)
+                {
+                    sb.Append($" ORDER BY \"{sorting.OrderBy}\" {sorting.SortDirection}");
+                }
+
+                if (paging != null)
+                {
+                    sb.Append($" LIMIT @rpp OFFSET @offset");
+                }
+
+                commandText = sb.ToString();
+
                 using var command = new NpgsqlCommand(commandText, connection);
+
+                command.Parameters.AddWithValue("@filterMake", filter.Make);
+                command.Parameters.AddWithValue("@filterModel", filter.Model);
+                command.Parameters.AddWithValue("@filterYearFrom", filter.YearFrom);
+                command.Parameters.AddWithValue("@filterYearTo", filter.YearTo);
+                command.Parameters.AddWithValue("@filterMileageFrom", filter.MileageFrom);
+                command.Parameters.AddWithValue("@filterMileageTo", filter.MileageTo);
+                command.Parameters.AddWithValue("@searchQuery", $"%{filter.SearchQuery}%");
+                command.Parameters.AddWithValue("@filterCarTypeId", filter.CarTypeId == null ? DBNull.Value : filter.CarTypeId);
+                command.Parameters.AddWithValue("@rpp", paging.Rpp);
+                command.Parameters.AddWithValue("offset", paging.Rpp * (paging.PageNumber - 1));
 
                 connection.Open();
                 using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
@@ -102,13 +169,13 @@ namespace Introduction.Repository
 
                 return cars;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return null;
             }
         }
 
-        public async Task<bool> InputCar(Car car)
+        public async Task<bool> InputCarAsync(Car car)
         {
             try
             {
@@ -145,7 +212,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> UpdateCar(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarAsync(CarUpdate car, Guid id)
         {
             try
             {
@@ -154,7 +221,7 @@ namespace Introduction.Repository
                 var sb = new StringBuilder();
                 using var command = new NpgsqlCommand(sb.ToString(), connection);
                 sb.Append("UPDATE \"Car\" SET ");
-                var currentCar = await GetById(id);
+                var currentCar = await GetByIdAsync(id);
                 if (currentCar == null) { return false; }
                 if (!string.IsNullOrWhiteSpace(car.Description) && !string.Equals(car.Description, currentCar.Description))
                 {
@@ -186,7 +253,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> DeleteCar(Guid id)
+        public async Task<bool> DeleteCarAsync(Guid id)
         {
             try
             {
@@ -215,7 +282,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<Car> GetById(Guid id)
+        public async Task<Car> GetByIdAsync(Guid id)
         {
             try
             {

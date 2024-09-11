@@ -7,7 +7,7 @@ namespace Introduction.Repository
     public class CarTypeRepository: ICarTypeRepository
     {
         private const string CONNECTION_STRING = "Host=localhost:5432;Username=postgres;Password=postgres;Database=car-dealershop";
-        public async Task<List<CarType>> Get()
+        public async Task<List<CarType>> GetAsync()
         {
             try
             {
@@ -42,7 +42,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<List<Car>> GetCars(Guid id)
+        public async Task<List<Car>> GetCarsAsync(Guid id)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<CarType> GetById(Guid id)
+        public async Task<CarType> GetByIdAsync(Guid id)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> InputCarType(CarType carType)
+        public async Task<bool> InputCarTypeAsync(CarType carType)
         {
             try
             {
@@ -157,7 +157,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> UpdateNameById(Guid id, string name)
+        public async Task<bool> UpdateNameByIdAsync(Guid id, string name)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             try
             {
