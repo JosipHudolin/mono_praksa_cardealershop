@@ -212,7 +212,7 @@ namespace Introduction.Repository
             }
         }
 
-        public async Task<bool> UpdateCarAsync(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarAsync(Car car)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace Introduction.Repository
                 var sb = new StringBuilder();
                 using var command = new NpgsqlCommand(sb.ToString(), connection);
                 sb.Append("UPDATE \"Car\" SET ");
-                var currentCar = await GetByIdAsync(id);
+                var currentCar = await GetByIdAsync((Guid)car.Id);
                 if (currentCar == null) { return false; }
                 if (!string.IsNullOrWhiteSpace(car.Description) && !string.Equals(car.Description, currentCar.Description))
                 {
@@ -236,7 +236,7 @@ namespace Introduction.Repository
                 sb.Length -= 1;
                 sb.Append(" WHERE \"Id\" = @id");
                 command.CommandText = sb.ToString();
-                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@id", car.Id);
 
                 int numberOfCommits = await command.ExecuteNonQueryAsync();
 

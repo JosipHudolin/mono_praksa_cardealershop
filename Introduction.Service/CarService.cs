@@ -33,14 +33,14 @@ namespace Introduction.Service
             }
         }
 
-        public async Task<bool> InputCarAsync(Car car)
+        public async Task<bool> InputCarAsync(Car carCreate)
         {
-            return await _carRepository.InputCarAsync(car);
+            return await _carRepository.InputCarAsync(carCreate);
         }
 
-        public async Task<bool> UpdateCarAsync(CarUpdate car, Guid id)
+        public async Task<bool> UpdateCarAsync(Car car)
         {
-            return await _carRepository.UpdateCarAsync(car, id);
+            return await _carRepository.UpdateCarAsync(car);
         }
 
         public async Task<bool> DeleteCarAsync(Guid id)

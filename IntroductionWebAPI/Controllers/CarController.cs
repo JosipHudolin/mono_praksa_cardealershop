@@ -1,7 +1,9 @@
 ﻿using Introduction.Common;
-using Introduction.Model;
 using Introduction.Service.Common;
 using Microsoft.AspNetCore.Mvc;
+using IntroductionWebAPI.RestModels;
+using Introduction.Model;
+using IntroductionWebAPI.Models;
 
 namespace IntroductionWebAPI.Controllers
 {
@@ -38,9 +40,20 @@ namespace IntroductionWebAPI.Controllers
             paging.PageNumber = pageNumber;
             paging.Rpp = rpp;
             var currentCars = await _carService.GetAllCarsAsync(filter, paging, sorting);
-            if (currentCars != null)
+            List<CarGet> cars = new List<CarGet>();
+            foreach (var car in currentCars)
             {
-                return Ok(currentCars);
+                var getCar = new CarGet();
+                getCar.Make = car.Make;
+                getCar.Model = car.Model;
+                getCar.Year = car.Year;
+                getCar.CarTypeName = car.CarType.Name;
+                getCar.Mileage = car.Mileage;
+                cars.Add(getCar);
+            }
+            if (cars != null)
+            {
+                return Ok(cars);
             }
             return Ok("There are no matching cars!");
         }
@@ -52,17 +65,30 @@ namespace IntroductionWebAPI.Controllers
         public async Task<IActionResult> GetCarByIdAsync(Guid id)
         {
             var currentCar = await _carService.GetCarByIdAsync(id);
-            if (currentCar != null)
+            CarGet car = new CarGet();
+            car.Make = currentCar.Make;
+            car.Model = currentCar.Model;
+            car.Year = currentCar.Year;
+            car.CarTypeName = currentCar.CarType.Name;
+            car.Mileage = currentCar.Mileage;
+            if (car != null)
             {
-                return Ok(currentCar);
+                return Ok(car);
             }
             return BadRequest();
         }
 
         [HttpPost]
         [Route("inputCar")]
-        public async Task<IActionResult> InputCarAsync([FromBody] Car car)
+        public async Task<IActionResult> InputCarAsync([FromBody] CarCreate carCreate)
         {
+            Car car = new Car();
+            car.Make = carCreate.Make;
+            car.Model = carCreate.Model;
+            car.CarTypeId = carCreate.CarTypeId;
+            car.Year = carCreate.Year;
+            car.Description = carCreate.Description;
+            car.Mileage = carCreate.Mileage;
             if (await _carService.InputCarAsync(car))
             {
                 return Ok();
@@ -72,9 +98,13 @@ namespace IntroductionWebAPI.Controllers
 
         [HttpPut]
         [Route("updateCar/{id}")]
-        public async Task<IActionResult> UpdateCarAsync([FromBody] CarUpdate car, Guid id)
+        public async Task<IActionResult> UpdateCarAsync(Guid id, [FromBody] CarUpdate car)
         {
-            if (await _carService.UpdateCarAsync(car, id))
+            Car updatedCar = new Car();
+            updatedCar.Id = id;
+            updatedCar.Mileage = car.Mileage;
+            updatedCar.Description = car.Description;
+            if (await _carService.UpdateCarAsync(updatedCar))
             {
                 return Ok();
             }
